@@ -32,7 +32,7 @@ def get_pledges():
 
     return pledges
 
-@app.post("/recivepledge")
+@app.post("/receivepledge")
 async def recievepledge(request: Request):
     data = await request.json()
     print("WEBHOOK DATA RECEIVED:")
