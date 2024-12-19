@@ -20,7 +20,7 @@ psrd=get_spreadsheet_pass(sheetid)
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "User"}
 
 
 @app.get("/pledges/")
