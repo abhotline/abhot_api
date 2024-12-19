@@ -17,6 +17,12 @@ sheetid="1EAl0Pb-ehUa8iX_f6O265Kdjkf0UIsRkZLEVNdW7bVo"
 email=get_spreadsheet_email(sheetid)
 psrd=get_spreadsheet_pass(sheetid)
 
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+
 @app.get("/pledges/")
 def get_pledges():
 
