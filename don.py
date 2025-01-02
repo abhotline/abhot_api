@@ -13,10 +13,8 @@ sheetid="1EAl0Pb-ehUa8iX_f6O265Kdjkf0UIsRkZLEVNdW7bVo"
 
 app = FastAPI()
 
-email=get_spreadsheet_email(sheetid)
-paswrd=get_spreadsheet_pass(sheetid)
-pc="mikvah usa"
-em="mvs2132005@gmail.com"
+email=str(get_spreadsheet_email(sheetid))
+paswrd=str(get_spreadsheet_pass(sheetid))
 
 
 
