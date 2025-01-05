@@ -2,11 +2,12 @@ from fastapi import FastAPI, Request
 from functions import *
 from fastapi.middleware.cors import CORSMiddleware
 import uuid
+import os 
 
 
 
 
-sheetid="1EAl0Pb-ehUa8iX_f6O265Kdjkf0UIsRkZLEVNdW7bVo"
+sheetid=os.environ.get('SHEET_ID')
 
 
 
@@ -49,25 +50,44 @@ async def recievepledge(request: Request):
     login_response=get_login_response_by_id(1)
     
     data = await request.json()
-    
-    print("1")
-    unique_id = str(uuid.uuid4())
-    name,ammount=getdetails(data,login_response)
-    if targetswitch:
-        add_or_update_donation(1,ammount)
-    
-    
-            
-    pledge_id=add_pledge(name, ammount)
-    print(pledge_id)
-    
-    requests.get(f"https://absocket.onrender.com/updateui?donorid={pledge_id}")
-    
+    project=getproject(data)
+    spreadsheetproject=get_spreadsheetproject(sheetid)
+    if project==spreadsheetproject:
+
+        name,ammount=getdetails(data,login_response)
+        if targetswitch:
+            add_or_update_donation(1,ammount)
+        
+        
+                
+        pledge_id=add_pledge(name, ammount)
+        print(pledge_id)
+        
+        requests.get(f"http://127.0.0.1:8000/updateui?donorid={pledge_id}")
+        
+        
+        
+
+        print("WEBHOOK DATA RECEIVED:")
+        
+        return {
+            "data": data
+        }
+    return {
+            "data": data
+        }
+
+
+
+@app.get("/updatedonation")
+@app.post("/updatedonation")
+async def updatedonation(value):
+    update_donation(1,value)
+    return {"donation": value}
     
     
 
-    print("WEBHOOK DATA RECEIVED:")
-    
-    return {
-        "data": data
-    }
+@app.get("/resetpledges")
+async def resetpledges():
+    delete_all_pledges()
+    return {"pledges": "reset"}

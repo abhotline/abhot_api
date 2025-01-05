@@ -4,6 +4,7 @@ import urllib
 import pandas as pd
 from datetime import datetime
 from typing import Optional
+import os
 
 import re
 from supabase import create_client, Client
@@ -62,7 +63,7 @@ def add_or_update_donation(id: int, value: float, target: Optional[float] = None
         
         # If the record exists, update the 'value' column
         existing_value = float(data[0]["value"])  # Convert existing value to float
-        updated_value = 0 if value == 0 else existing_value + value  # Update the value if not zero
+        updated_value = existing_value + value  # Update the value if not zero
 
         # Prepare the update data
         update_data = {"value": str(updated_value)}  # Save value as text
@@ -85,13 +86,28 @@ def add_or_update_donation(id: int, value: float, target: Optional[float] = None
     
     except Exception as e:
         return {"success": False, "error": str(e)}
+    
+
+def update_donation(id: int, value: str):
+    # Fetch the item by id
+    donation = supabase.table('donations').select('*').eq('id', id).execute()
+    print(donation)
+
+    # Check if the item exists
+    if donation.data:
+        # Update the column 'value' with the new value
+        update_response = supabase.table('donations').update({'value': value}).eq('id', id).execute()
+        
+        
+    else:
+        print(f"No donation found with ID {id}.")
 
 
 
 
 # Initialize Supabase client
-supabase_url = "https://htjfvxtqbbwsdyupnosk.supabase.co"  # Replace with your Supabase URL
-supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0amZ2eHRxYmJ3c2R5dXBub3NrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNTczNjgyMiwiZXhwIjoyMDUxMzEyODIyfQ.lq-SHM1yd_TXehhUQOLGreYiD1f9s_4IUvdXwfNXkEc"  # Replace with your Supabase API Key
+supabase_url = os.getenv("SUPABASE_URL") # Replace with your Supabase URL
+supabase_key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(supabase_url, supabase_key)
 
 # Function to create the pledges table
@@ -408,6 +424,16 @@ def login_function(email,password,response_token):
     else:
         print("Login failed. Status code:", response3.status_code)
         print("Response:", response3.text)  # Print the error message from the server
+
+
+def delete_all_pledges():
+    # Use a condition that matches all rows
+    response = supabase.table("pledges").delete().gte("id", 0).execute()
+    print(response)
+    if "status_code" not in response or response["status_code"] == 200:
+        print("All data in the 'pledges' table has been deleted.")
+    else:
+        print(f"Failed to delete data: {response}")
         
         
 
@@ -502,20 +528,43 @@ def get_donor_info(donors, donor_id):
         if donor.get("accountNum") == donor_id:
             return donor
     return None
+
+def getproject(data):
+    return data["CampaignInfo"]["CampaignName"].lower()
+
+def get_spreadsheetproject(sheet_id):
+    """
+    Fetches the email from cell B2 of a public Google Sheet.
+    
+    Parameters:
+        sheet_id (str): The ID of the Google Sheet (found in the sheet's URL).
+    
+    Returns:
+        str: The email from cell B2.
+    """
+    # Construct the CSV URL
+    csv_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
+    
+    # Read the data into a DataFrame
+    data = pd.read_csv(csv_url)
+    
+    # Extract and return the email from the second column (B2)
+    email = data.iloc[3, 1].lower()  # Assuming B2 corresponds to index 0, column 1
+    return email
 def getdetails(webhookdata,loginresponse):
     donori=webhookdata["DonorInfo"]
 
 
     try:
         donori["NewDonor"]
-        donorname=donori["NewDonor"]["FirstName"]+" "+donori["NewDonor"]["LastName"]
+        donorname=donori["NewDonor"]["FirstNameJewish"]+" "+donori["NewDonor"]["LastNameJewish"]
         ammout=webhookdata["PledgeAmount"]
         id=donori["DonorNumber"]
         return donorname,ammout
     except:
         donors=get_donors(loginresponse)
         donorinfo=get_donor_info(donors,webhookdata["DonorInfo"]["DonorNumber"])
-        donorname=donorinfo["fullName"]
+        donorname=donorinfo["fullNameJewish"]
         ammout=webhookdata["PledgeAmount"]
         id=donori["DonorNumber"]
         return donorname,ammout
