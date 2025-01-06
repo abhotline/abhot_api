@@ -63,7 +63,7 @@ async def recievepledge(request: Request):
         pledge_id=add_pledge(name, ammount)
         print(pledge_id)
         
-        requests.get(f"http://127.0.0.1:8000/updateui?donorid={pledge_id}")
+        requests.get(f"https://absocket-gm2g.onrender.com/updateui?donorid={pledge_id}")
         
         
         
