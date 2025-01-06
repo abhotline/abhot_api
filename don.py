@@ -81,9 +81,9 @@ async def recievepledge(request: Request):
 
 @app.get("/updatedonation")
 @app.post("/updatedonation")
-async def updatedonation(value):
+async def updatedonation():
     reset_target()
-    return {"donation": value}
+    return {"donation"}
     
     
 
