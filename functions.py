@@ -28,7 +28,7 @@ def add_pledge(name: str, amount: float):
         
         return 
 
-def add_or_update_donation(id: int, value: float, target: Optional[float] = None, reset_met_at: Optional[bool] = False):
+def add_or_update_donation(id: int, $ float, target: Optional[float] = None, reset_met_at: Optional[bool] = False):
     """
     Adds or updates a donation in the 'donations' table.
     
