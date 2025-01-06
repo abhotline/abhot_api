@@ -88,26 +88,14 @@ def add_or_update_donation(id: int, value: float, target: Optional[float] = None
         return {"success": False, "error": str(e)}
     
 
-def update_donation(id: int, value: str):
-    # Fetch the item by id
-    donation = supabase.table('donations').select('*').eq('id', id).execute()
-    print(donation)
 
-    # Check if the item exists
-    if donation.data:
-        # Update the column 'value' with the new value
-        update_response = supabase.table('donations').update({'value': value}).eq('id', id).execute()
-        
-        
-    else:
-        print(f"No donation found with ID {id}.")
 
 
 
 
 # Initialize Supabase client
 supabase_url = os.getenv("SUPABASE_URL") # Replace with your Supabase URL
-supabase_key = os.getenv("SUPABASE_KEY")
+supabase_key = os.getenv("SUPABASE_KEY") # Replace with your Supabase API Key
 supabase: Client = create_client(supabase_url, supabase_key)
 
 # Function to create the pledges table
@@ -218,7 +206,12 @@ def upsert_login_response(id: int, response: dict):
         
         return "fail"
 
+def reset_target():
+    # Initialize the Supabase client
+    
 
+    # Update the column to 0 where id equals 1
+    response = supabase.table("donations").update({"value": 0}).eq("id", 1).execute()
 
 def get_login_response_by_id(id: int):
     """
